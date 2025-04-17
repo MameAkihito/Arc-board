@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>簡易掲示板</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .thread-list { margin-top: 20px; }
+        .thread { padding: 10px; border: 1px solid #ddd; margin-bottom: 10px; }
+        .thread h3 { margin: 0; }
+        .post-form { margin-top: 20px; }
+        textarea { width: 100%; height: 100px; }
+        input[type="text"] { width: 100%; padding: 8px; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <h1>簡易掲示板</h1>
+
+    <div class="thread-list" id="thread-list">
+        <!-- スレッドがここに表示されます -->
+    </div>
+
+    <div class="post-form">
+        <h3>スレッドを作成</h3>
+        <form id="post-form">
+            <input type="text" id="thread-title" placeholder="タイトル" required>
+            <textarea id="thread-content" placeholder="内容" required></textarea>
+            <button type="submit">スレッド作成</button>
+        </form>
+    </div>
+
+    <script>
+        // スレッド情報を保存するための配列
+        const threads = [];
+
+        // スレッドを表示する関数
+        function renderThreads() {
+            const threadList = document.getElementById('thread-list');
+            threadList.innerHTML = ''; // 既存のスレッドをリセット
+            threads.forEach((thread, index) => {
+                const threadElement = document.createElement('div');
+                threadElement.classList.add('thread');
+                threadElement.innerHTML = `
+                    <h3>${thread.title}</h3>
+                    <p>${thread.content}</p>
+                    <button onclick="addReply(${index})">レスを追加</button>
+                    <div class="replies">
+                        ${thread.replies.map(reply => `<p>${reply}</p>`).join('')}
+                    </div>
+                `;
+                threadList.appendChild(threadElement);
+            });
+        }
+
+        // レスを追加する関数
+        function addReply(threadIndex) {
+            const reply = prompt('レスを入力してください:');
+            if (reply) {
+                threads[threadIndex].replies.push(reply); // レスを追加
+                renderThreads(); // 再描画
+            }
+        }
+
+        // スレッド投稿フォームの送信処理
+        document.getElementById('post-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const title = document.getElementById('thread-title').value;
+            const content = document.getElementById('thread-content').value;
+            threads.push({ title, content, replies: [] }); // 新しいスレッドを追加
+            renderThreads(); // スレッドを再描画
+            document.getElementById('post-form').reset(); // フォームをリセット
+        });
+
+        // 初期表示
+        renderThreads();
+    </script>
+</body>
+</html>
